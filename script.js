@@ -1,50 +1,51 @@
-// function adder(x, y, callback) {
-//     setTimeout(() => callback(x + y), 3000)
-// }
-
-// adder(5, 10, result => console.log(result))
-// adder(15, 20, result => alert(result))
-
-// console.log('Hello')
-
-
-function getJoke(cb) {
-    req = new XMLHttpRequest() // Class in JS act as Postman
-    req.addEventListener('load', event => cb(event.target.response.joke)) //After request finish cb executed
-    req.open('GET', 'https://icanhazdadjoke.com/') //Open connection with server
-    req.setRequestHeader("Accept", "application/json")
-    req.responseType = 'json'
-    req.send()
+function adder(x, y, callback) {
+    setTimeout(() => callback(x + y), 3000) // Delay cb execution for 3 sec
+    console.log('Start') // 1, 2
 }
 
-// getJoke(joke => console.log(joke))
-// getJoke(joke => document.body.innerHTML += `<p>${joke}</p>`)
+//// This two will be shown almost together
+//// Because other codes not waiting for the callback function to be completed.
+adder(5, 10, result => console.log(result))  // 4
+adder(15, 10, result => console.log(result))  // 5
 
-// console.log('Waiting for Joke ...')
+console.log('Hello') // 3
+
+//////////////////////  //////////////////
+
+function getJoke(cb) {
+    req = new XMLHttpRequest() // Use to make requests
+    req.addEventListener('load', e => cb(e.target.response.joke)) // Set 'load' to execute the cb after send() finishes 
+    req.open('GET', 'https://icanhazdadjoke.com/')  // Opens a connection to the server
+    req.setRequestHeader("Accept", "application/json") // Receives json response
+    req.responseType = 'json' // Convert string response to json so you can manipulate the response
+    req.send()  // Send a request | Asynchronous
+}
+
+// Asynchronous
+getJoke(joke => console.log(joke))  
+getJoke(joke => document.body.innerHTML += `<p>${joke}</p>`)  
+console.log('Waiting for joke...')  // This will be shown first.
+
 
 const jokes = []
 
-// This will just return empty array
-// getJoke(joke => jokes.push(joke))
-// getJoke(joke => jokes.push(joke))
-// getJoke(joke => jokes.push(joke))
-// console.log(jokes)
+//// This will return an empty array 
+//// since getJoke() is callback and it's asynchronous
+//// console.log(jokes) will be executed while waiting for response
+getJoke(joke => jokes.push(joke))
+getJoke(joke => jokes.push(joke))
+getJoke(joke => jokes.push(joke))
+console.log(jokes)
 
-//// This only return one joke in array too
-// getJoke(joke => {
-//     jokes.push(joke)
-// })
-// getJoke(joke => {
-//     jokes.push(joke)
-//     console.log(jokes)
-// })
 
-//// To retrieve two jokes successfully in array.
+// Use this way to successfully return jokes in the array
 getJoke(joke => {
     jokes.push(joke)
     getJoke(joke => {
         jokes.push(joke)
-        console.log(jokes)
+        getJoke(joke => {
+            jokes.push(joke)
+            console.log(jokes)
+        })
     })
 })
-
